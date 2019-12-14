@@ -1,0 +1,26 @@
+﻿@using Cirice.Data.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+
+    <ul class="navbar-nav">
+        @if(SignInManager.IsSignedIn(User))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-page="/Account/Manage/Index" title="Manage">@User.Identity.Name!</a>
+            </li>
+            <li class="nav-item">
+                <form class="form-inline" asp-controller="Account" asp-action="LogOut" method="post">
+                    <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Sign Out</button>
+                </form>
+            </li>
+        }
+        else
+        {
+            <li>
+                <form class="form-inline mt-2 mt-md-0" asp-controller="Account" asp-action="Login" method="get">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Sign in</button>
+                </form>
+            </li>
+        }
+    </ul>

@@ -1,0 +1,14 @@
+﻿@model Cirice.Data.ViewModels.LoginViewModel
+<div id="logreg-forms">
+    <form class="form-signin" method="post" asp-action="Login">
+        <h1 class="h3 mb-3 font-weight-normal" style="text-align: center"> Sign in</h1>
+        <div asp-validation-summary="ModelOnly"></div>
+        <input asp-for="Name" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+        <input asp-for="Password" id="inputPassword" class="form-control" placeholder="Password" required="">
+
+        <button class="btn btn-success btn-block" type="submit"><i class="fas fa-sign-in-alt"></i> Sign in</button>
+        <a asp-action="ResetPassword" id="forgot_pswd">Forgot password?</a>
+        <hr>
+        <a asp-action="Register" asp-controller="Account" class="btn btn-primary btn-block" style="color:white" id="btn-signup"><i class="fas fa-user-plus"></i> Sign up New Account</a>
+    </form>
+</div>

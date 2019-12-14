@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Cirice.Data.Models
+{
+    public class Rating
+    {
+        public long Id { get; set; }
+        public long CompositionId { get; set; }
+        public long UserId { get; set; }
+        public byte Mark { get; set; }
+    }
+}
