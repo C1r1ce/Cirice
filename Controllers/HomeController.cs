@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Cirice.Data;
+using Cirice.Data.Models;
+using Cirice.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Cirice.Models;
@@ -12,16 +14,16 @@ namespace Cirice.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private DbGenreService _dbGenreService;
+        private DbTagService _dbTagService;
+        public HomeController(DbGenreService dbGenreService,DbTagService dbTagService)
         {
-            _logger = logger;
+            _dbGenreService = dbGenreService;
+            _dbTagService = dbTagService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            
             return View();
         }
 

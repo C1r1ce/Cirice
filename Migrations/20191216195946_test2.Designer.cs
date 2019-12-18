@@ -4,14 +4,16 @@ using Cirice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Cirice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191216195946_test2")]
+    partial class test2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,8 +79,8 @@ namespace Cirice.Migrations
                     b.Property<DateTime>("FirstPublication")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GenreId")
-                        .HasColumnType("int");
+                    b.Property<byte>("GenreId")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("ImgSource")
                         .HasColumnType("nvarchar(max)");
@@ -86,11 +88,8 @@ namespace Cirice.Migrations
                     b.Property<DateTime>("LastPublication")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -182,10 +181,15 @@ namespace Cirice.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<long?>("CompositionId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("TagString")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompositionId");
 
                     b.ToTable("Tags");
                 });
@@ -396,6 +400,13 @@ namespace Cirice.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Cirice.Data.Models.Tag", b =>
+                {
+                    b.HasOne("Cirice.Data.Models.Composition", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("CompositionId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

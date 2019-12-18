@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cirice.Data;
+using Cirice.Data.Cloud;
 using Cirice.Data.Email;
 using Cirice.Data.Models;
 using Cirice.Data.Services;
@@ -47,8 +48,15 @@ namespace Cirice
                 o.TokenLifespan = TimeSpan.FromHours(3));
 
             services.AddTransient<IEmailSender, MailKitEmailService>();
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AuthMessageSenderOptions>(appSettingsSection);
+            services.AddTransient<ICloudUploader, CloudUploadService>();
+            services.AddTransient<DbGenreService>();
+            services.AddTransient<DbTagService>();
+            services.AddTransient<DbCompositionService>();
+            services.AddTransient<DbCompositionTagService>();
+            var emailSettingsSection = Configuration.GetSection("AppSettings");
+            var cloudSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AuthMessageSenderOptions>(emailSettingsSection);
+            services.Configure<CloudinaryOptions>(cloudSettingsSection);
 
             services.AddControllersWithViews();
             services.AddMvc();

@@ -1,6 +1,68 @@
-﻿@{
-}
-<div class="col-md-1"></div>
-<div class="col-12 col-md-10 bg-light">
+﻿@using System.Collections.Specialized
+@using Cirice.Data.Models
+@using Cirice.Data.Services
+@model Cirice.Data.ViewModels.CompositionCreateViewModel
+@inject Cirice.Data.Services.DbGenreService _dbGenreService
+@inject Cirice.Data.Services.DbTagService _dbTagService
+<div class="container row">
+    <div class="col-md-1 bg-light"></div>
+    <div class="col-12 col-md-10 bg-light pb-3 pt-3">
+        <form method="post" asp-action="Create" asp-controller="Composition">
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="form-group">
+                <div for="compositionName">Name of composition</div>
+                <input asp-for="Name" type="text" class="form-control" id="compositionName" placeholder="Enter name of your composition" />
+            </div>
+            <div class="form-group">
+                <label for="SelectGenre">Select Genre</label>
+                <select asp-for="GenreString" class="form-control" id="SelectGenre">
+                    @{
+                        var genres = _dbGenreService.GetGenres();
+                        foreach (Genre genre in genres)
+                        {
+                            <option name="@genre.GenreString">@genre.GenreString</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <div for="tags" class="d-inline-flex">Tags<div class="text-muted">(Use enter to add tag)</div></div>
+                <input asp-for="Tags" type="text" placeholder="Enter tags" class="flexdatalist form-control" data-min-length="1" multiple='multiple'
+                       list="tagList" name='tags'>
 
+                <datalist id="tagList">
+                    @{
+                        var tags = _dbTagService.GetTags();
+                        foreach (Tag tag in tags)
+                        {
+                            <option value="@tag.TagString">@tag.TagString</option>
+                        }
+                    }
+                </datalist>
+            </div>
+            <div class="form-group">
+                <div for="annotation" class="d-inline-flex">Annotation<div class="text-muted">(max length 200 symbols)</div></div>
+                <textarea asp-for="Annotation" class="form-control" id="annotation" name="Annotation" title=""></textarea>
+            </div>
+            <div class="row">
+                <div class="col-12 d-inline-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-outline-success ">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-1 bg-light"></div>
 </div>
+@section Scripts
+{
+    <script>
+        $(document).keypress(
+            function(event){
+                if (event.which == '13') {
+                    event.preventDefault();
+                }
+            });
+    </script>
+    <script src="~/js/dropzone.js"></script>
+    <script src="~/js/jquery.flexdatalist.min.js"></script>
+}

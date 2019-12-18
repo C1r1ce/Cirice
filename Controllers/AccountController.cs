@@ -19,7 +19,7 @@ namespace Cirice.Controllers
 
         private readonly SignInManager<User> _signInManager;
 
-        private IEmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         
 
         public AccountController(UserManager<User> userManager,
@@ -38,6 +38,7 @@ namespace Cirice.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -50,10 +51,9 @@ namespace Cirice.Controllers
                     User user = await _userManager.FindByEmailAsync(model.Email);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUri = Url.Action("ConfirmEmail", "Account",new {UserId=user.Id,Code=code},protocol:HttpContext.Request.Scheme);
-                    await _emailSender.SendEmailAsync(user.Email,user.UserName, "Cirice - Confirm your email",
-                        "<div>Please click the link to confirm your email: <a href='" + callbackUri + "'>click here</a></div>");
-                    await _signInManager.SignInAsync(user, false);
-                    return RedirectToAction("Index", "Home");
+                    await _emailSender.SendEmailAsync(user.Email,user.UserName, "Confirm your email",
+                        "<div>Hi dear "+ user.UserName+". Please click the link to confirm your email: <a href='" + callbackUri + "'>click here</a></div>");
+                    return RedirectToAction("ConfirmEmailSend", "Notifications");
                 }
                 else
                 {
@@ -67,10 +67,87 @@ namespace Cirice.Controllers
         }
 
         [HttpGet]
-        public IActionResult ResetPassword()
+        public IActionResult ForgotPassword()
         {
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "The user with this mail does not exist");
+                }
+                else
+                {
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var callbackUri = Url.Action("ResetPassword", "Account", new { UserId = user.Id, Code = code }, protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(user.Email, user.UserName, "Reset password",
+                        "<div>Hi dear " + user.UserName + ". Please click the link to reset your password: <a href='" + callbackUri + "'>click here</a></div>");
+                    return RedirectToAction("ResetPasswordSend","Notifications");
+                }
+            }
+            
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string userId, string code)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model, string userId, string code)
+        {
+            IActionResult result;
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                result = RedirectToAction("Login", "Account");
+            }
+            else
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    result = BadRequest();
+                }
+                else
+                {
+                    var reset = await _userManager.ResetPasswordAsync(user, code, model.Password);
+                    if (reset.Succeeded)
+                    {
+                        result = RedirectToAction("ResetPasswordSuccess", "Notifications");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("",
+                            "Something go wrong, we don`t change your password. Try again later.");
+                        result = View();
+                    }
+                }
+            }
+
+            return result;
+        }
+
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
@@ -86,14 +163,14 @@ namespace Cirice.Controllers
             }
             if (!user.EmailConfirmed)
             {
-                var result = await _userManager.ConfirmEmailAsync(user, code);
+                await _userManager.ConfirmEmailAsync(user, code);
             }
             else
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Index","Home");
             }
 
-            return View();
+            return RedirectToAction("ConfirmEmailSuccess","Notifications");
         }
 
         [HttpGet]
@@ -143,6 +220,7 @@ namespace Cirice.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
 
         public async Task Delete2Users()
         {

@@ -26,7 +26,7 @@ namespace Cirice.Data.Services
             var mailPassword = _authOptions.MailPassword;
             var emailMessage = new MimeMessage();
 
-            emailMessage.From.Add(new MailboxAddress("Administration of Cirice", mailAddress));
+            emailMessage.From.Add(new MailboxAddress("Cirice", mailAddress));
             emailMessage.To.Add(new MailboxAddress(userName, userEmail));
             emailMessage.Subject = emailSubject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)

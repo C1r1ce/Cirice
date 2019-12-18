@@ -6,17 +6,8 @@ using System.Threading.Tasks;
 
 namespace Cirice.Data.ViewModels
 {
-    public class RegisterViewModel
+    public class ResetPasswordViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-
-        [Required]
-        [Display(Name = "Name")]
-        [StringLength(50, MinimumLength = 4)]
-        public string Name { get; set; }
-
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
