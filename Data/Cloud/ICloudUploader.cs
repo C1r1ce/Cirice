@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Cirice.Data.Cloud
 {
-    interface ICloudUploader
+    public interface ICloudUploader
     {
         string UploadImg(IFormFile file);
     }

@@ -1,0 +1,59 @@
+﻿@using Cirice.Data.Models
+@model Cirice.Data.ViewModels.ListCompositionViewModel
+
+@foreach (var composition in Model.CompositionViewModels)
+{
+    <div class="m-2 mt-4 pb-4 border-bottom">
+        <div class="row">
+            <div class="col-12 col-lg-3">
+                @if (composition.ImgSource != null)
+                {
+                    <img src="@composition.ImgSource" style="max-width: 100%; max-height: 250px" />
+                }
+                else
+                {
+                    <img src="~/noimage.jpeg" style="max-width: 100%; max-height: 250px" />
+                }
+
+            </div>
+            <div class="col-12 col-lg-9 row mb-0">
+                <p class="col-12 font-weight-bold">@composition.Name</p>
+                <div class="col-12 d-inline-flex mb-0">
+                    <div class="text-muted mr-1">Author:</div>
+                    <a asp-action="Index" asp-controller="Account" asp-route-user="@composition.UserId">@composition.UserName</a>
+                </div>
+                <div class="col-12 d-inline-flex">
+                    <div class="mr-2 text-muted mb-0">Genre:</div>
+                    <div>@composition.GenreString</div>
+                </div>
+                <div class="col-12 d-inline-flex">
+                    @{
+                        foreach (Tag modelTag in composition.Tags)
+                        {
+                            <a href="">#@modelTag.TagString</a>
+                        }
+                    }
+                </div>
+                <div class="col-12 mt-1">
+                    <h6 class="mb-0">Description:</h6>
+                    <h6 class="font-weight-normal">@composition.Annotation</h6>
+                </div>
+                <div class="col-6 d-inline-flex">
+                    <div class="text-muted mr-1">@composition.Likes</div>
+                    <img src="comments-16.png" height="16px" alt="" class="mt-2" />
+                    @{
+                        var day = composition.LastPublication.ToString("dd.MM.yyyy");
+                        var dayTime = composition.LastPublication.ToString("dd.MM.yyyy HH:mm");
+                    }
+                    <div class="text-muted ml-4" title="Last edit: @dayTime">@day</div>
+                </div>
+                <div class="col-6 d-inline-flex flex-md-row-reverse">
+                    <p>Rating: @composition.Rating/5</p>
+                </div>
+                <div class="col-12">
+                    <a asp-action="Index" asp-controller="Composition" asp-route-id="@composition.CompositionId" class="text-decoration-none text-dark font-weight-bold ml-1">More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -6,15 +6,19 @@ using Cirice.Data.Models;
 
 namespace Cirice.Data.Services
 {
-    public class DbCompositionTagService
+    public class DbLikeService
     {
         private AppDbContext _dbContext;
 
-        public DbCompositionTagService(AppDbContext dbContext)
+        public DbLikeService(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        
+        public int GetLikeCountByCompositionId(long id)
+        {
+            var likes = _dbContext.Likes.Where(l => id == l.CompositionId);
+            return likes.Count();
+        }
     }
 }

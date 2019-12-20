@@ -8,6 +8,7 @@ namespace Cirice.Data.Services
 {
     public class DbTagService
     {
+        //todo refactor compositiontag service and tagservice in one
         private AppDbContext _dbContext;
 
         public DbTagService(AppDbContext dbContext)
@@ -59,6 +60,40 @@ namespace Cirice.Data.Services
         {
             var iquerybleTags = _dbContext.Tags.Where(t => tagStrings.Contains(t.TagString));
             return iquerybleTags;
+        }
+
+        public void AddCompositionTags(long compositionId, IQueryable<Tag> tags)
+        {
+            List<CompositionTag> list = new List<CompositionTag>();
+            foreach (Tag tag in tags)
+            {
+                list.Add(new CompositionTag()
+                {
+                    CompositionId = compositionId,
+                    TagId = tag.Id
+                });
+            }
+            _dbContext.CompositionTags.AddRange(list);
+            _dbContext.SaveChanges();
+        }
+
+        public void UpdateCompositionTags(long compositionId, IQueryable<Tag> tags)
+        {
+            List<CompositionTag> tagsAfter = new List<CompositionTag>();
+            foreach (Tag tag in tags)
+            {
+                tagsAfter.Add(new CompositionTag()
+                {
+                    CompositionId = compositionId,
+                    TagId = tag.Id
+                });
+            }
+            var allTagsByCompositionBefore = _dbContext.CompositionTags.Where(t => t.CompositionId == compositionId);
+            var tagsDeleted = allTagsByCompositionBefore.Except(tagsAfter);
+            var tagsToAdd = tagsAfter.Except(allTagsByCompositionBefore);
+            _dbContext.CompositionTags.RemoveRange(tagsDeleted);
+            _dbContext.CompositionTags.AddRange(tagsToAdd);
+            _dbContext.SaveChanges();
         }
     }
 }

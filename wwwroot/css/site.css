@@ -132,4 +132,19 @@ body {
 
 #logreg-forms .form-signup input { margin-bottom: 2px;}
 
+/*Comments*/
+.comments ul ul {
+    margin-left: 60px;
+}
 
+.comments .comment img {
+    margin-right: 20px;
+}
+
+.comments .comment {
+    padding: 6px;
+}
+
+.comments .comment:hover {
+    background: #eee;
+}

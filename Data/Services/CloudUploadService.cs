@@ -23,12 +23,14 @@ namespace Cirice.Data.Services
 
         public string UploadImg(IFormFile file)
         {
-            Stream stream = file.OpenReadStream();
+            var stream = file.OpenReadStream();
+            
             var uploadParams = new ImageUploadParams()
             {
-                File = new FileDescription("", stream),
+                File = new FileDescription(file.FileName, stream),
             };
             var uploadResult = cloudinary.Upload(uploadParams);
+            stream.Close();
             return uploadResult.SecureUri.AbsoluteUri;
         }
     }

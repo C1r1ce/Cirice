@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 using Cirice.Data;
 using Cirice.Data.Models;
 using Cirice.Data.Services;
+using Cirice.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Cirice.Models;
+using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Security;
 
 namespace Cirice.Controllers
 {
@@ -16,15 +19,80 @@ namespace Cirice.Controllers
     {
         private DbGenreService _dbGenreService;
         private DbTagService _dbTagService;
-        public HomeController(DbGenreService dbGenreService,DbTagService dbTagService)
+        private DbCompositionService _dbCompositionService;
+        private DbCompositionTagService _dbCompositionTagService;
+        private DbLikeService _dbLikeService;
+        private DbRatingService _dbRatingService;
+        private UserManager<User> _userManager;
+
+        private const int NumberOfLoadedCompositions = 5;
+
+        public HomeController(
+            DbCompositionService dbCompositionService,
+            DbGenreService dbGenreService,
+            DbTagService dbTagService,
+            DbCompositionTagService dbCompositionTagService,
+            DbLikeService dbLikeService,
+            DbRatingService dbRatingService,
+            UserManager<User> userManager)
         {
+            _dbCompositionService = dbCompositionService;
             _dbGenreService = dbGenreService;
             _dbTagService = dbTagService;
+            _dbCompositionTagService = dbCompositionTagService;
+            _dbLikeService = dbLikeService;
+            _dbRatingService = dbRatingService;
+            _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            return View();
+            int page = id ?? 0;
+            var list = GetItems(page);
+            if (page == 0)
+            {
+                return View(new ListCompositionViewModel()
+                {
+                    CompositionViewModels = list
+                });
+            }
+            else
+            {
+                return PartialView("_Item", new ListCompositionViewModel()
+                {
+                    CompositionViewModels = list
+                });
+            }
+        }
+
+        private List<CompositionViewModel> GetItems(int page)
+        {
+            var compositions = _dbCompositionService.GetCompositionsOrderedByDate(NumberOfLoadedCompositions, page);
+            List<CompositionViewModel> list = new List<CompositionViewModel>();
+            foreach (Composition composition in compositions)
+            {
+                Genre genre = _dbGenreService.FindById(composition.GenreId);
+                var tags = _dbTagService.FindByCompositionId(composition.Id);
+                var likeCount = _dbLikeService.GetLikeCountByCompositionId(composition.Id);
+                var rating = _dbRatingService.GetAverageRatingByCompositionId(composition.Id);
+                var user = _userManager.FindByIdAsync(composition.UserId).Result;
+                list.Add(new CompositionViewModel()
+                {
+                    Annotation = composition.Annotation,
+                    GenreString = genre.GenreString,
+                    ImgSource = composition.ImgSource,
+                    LastPublication = composition.LastPublication,
+                    Likes = likeCount,
+                    Name = composition.Name,
+                    Rating = rating,
+                    Tags = tags,
+                    UserName = user.UserName,
+                    CompositionId = composition.Id,
+                    UserId = user.Id
+                });
+            }
+
+            return list;
         }
 
         public IActionResult Privacy()

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.Patterns;
 using Microsoft.Extensions.Hosting;
 
 namespace Cirice
@@ -45,7 +46,7 @@ namespace Cirice
                 .AddDefaultTokenProviders();
 
             services.Configure<DataProtectionTokenProviderOptions>(o =>
-                o.TokenLifespan = TimeSpan.FromHours(3));
+                o.TokenLifespan = TimeSpan.FromHours(5));
 
             services.AddTransient<IEmailSender, MailKitEmailService>();
             services.AddTransient<ICloudUploader, CloudUploadService>();
@@ -53,6 +54,8 @@ namespace Cirice
             services.AddTransient<DbTagService>();
             services.AddTransient<DbCompositionService>();
             services.AddTransient<DbCompositionTagService>();
+            services.AddTransient<DbLikeService>();
+            services.AddTransient<DbRatingService>();
             var emailSettingsSection = Configuration.GetSection("AppSettings");
             var cloudSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AuthMessageSenderOptions>(emailSettingsSection);
@@ -88,6 +91,7 @@ namespace Cirice
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }

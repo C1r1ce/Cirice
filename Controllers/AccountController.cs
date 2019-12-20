@@ -31,6 +31,12 @@ namespace Cirice.Controllers
             _signInManager = signInManager;
             _emailSender = emailSender;
         }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
         [HttpGet]
         public IActionResult Register()
         {

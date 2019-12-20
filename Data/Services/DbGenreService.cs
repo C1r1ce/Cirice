@@ -26,6 +26,11 @@ namespace Cirice.Data.Services
 
             return result;
         }
+
+        public Genre FindById(int id)
+        {
+            return _dbContext.Genres.Find(id);
+        }
         public IQueryable<Genre> GetGenres()
         {
             return _dbContext.Set<Genre>();

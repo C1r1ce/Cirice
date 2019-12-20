@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cirice.Data.Models;
+using Cirice.Data.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cirice.Data.Services
 {
@@ -22,7 +24,7 @@ namespace Cirice.Data.Services
 //            return _dbContext.Compositions.Find(composition).Id;
 //        }
 
-        public Composition GetByName(string name)
+        public Composition FindByName(string name)
         {
             var compositions = _dbContext.Compositions.Where(c=>c.Name.Equals(name));
             Composition result=null;
@@ -44,14 +46,24 @@ namespace Cirice.Data.Services
 
         public Composition FindById(long id)
         {
-            var composition = _dbContext.Compositions.Where(c=>c.Id==id);
-            Composition result = null;
-            if (composition.Any())
-            {
-                result = composition.First();
-            }
-
-            return result;
+            return _dbContext.Compositions.Find(id);
         }
+
+        public void Update(Composition composition)
+        {
+            _dbContext.Compositions.Update(composition);
+            _dbContext.SaveChanges();
+        }
+
+        public IEnumerable<Composition> GetCompositionsOrderedByDate(int number,int page)
+        {
+            
+            var compositions = _dbContext.Compositions.OrderByDescending(c=>c.LastPublication)
+                .Skip(page*number).Take(number).ToList();
+
+            return compositions;
+        }
+
+      
     }
 }
