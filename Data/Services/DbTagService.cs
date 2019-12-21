@@ -8,7 +8,6 @@ namespace Cirice.Data.Services
 {
     public class DbTagService
     {
-        //todo refactor compositiontag service and tagservice in one
         private AppDbContext _dbContext;
 
         public DbTagService(AppDbContext dbContext)
@@ -56,13 +55,13 @@ namespace Cirice.Data.Services
             _dbContext.SaveChanges();
         }
 
-        public IQueryable<Tag> FindAllByTagStrings(ICollection<string> tagStrings)
+        public IEnumerable<Tag> FindAllByTagStrings(ICollection<string> tagStrings)
         {
-            var iquerybleTags = _dbContext.Tags.Where(t => tagStrings.Contains(t.TagString));
+            var iquerybleTags = _dbContext.Tags.Where(t => tagStrings.Contains(t.TagString)).ToList();
             return iquerybleTags;
         }
 
-        public void AddCompositionTags(long compositionId, IQueryable<Tag> tags)
+        public void AddCompositionTags(long compositionId, IEnumerable<Tag> tags)
         {
             List<CompositionTag> list = new List<CompositionTag>();
             foreach (Tag tag in tags)
@@ -77,22 +76,37 @@ namespace Cirice.Data.Services
             _dbContext.SaveChanges();
         }
 
-        public void UpdateCompositionTags(long compositionId, IQueryable<Tag> tags)
+        public void UpdateCompositionTags(long compositionId, IEnumerable<Tag> tags)
         {
-            List<CompositionTag> tagsAfter = new List<CompositionTag>();
-            foreach (Tag tag in tags)
+            var allTagsByCompositionBefore = _dbContext.CompositionTags.Where(t => t.CompositionId == compositionId).ToList();
+            List<CompositionTag> compositionTagsExist = new List<CompositionTag>();
+            List<Tag> tagsExist = new List<Tag>();
+            foreach (var tag in tags)
             {
-                tagsAfter.Add(new CompositionTag()
+                foreach (var compositionTag in allTagsByCompositionBefore)
+                {
+                    if (tag.Id == compositionTag.TagId)
+                    {
+                        compositionTagsExist.Add(compositionTag);
+                        tagsExist.Add(tag);
+                        break;
+                    }
+                }
+                
+            }
+            var tagsToAdd = tags.Except(tagsExist);
+            var compositionTagsToAdd = new List<CompositionTag>();
+            foreach (var tag in tagsToAdd)
+            {
+                compositionTagsToAdd.Add(new CompositionTag()
                 {
                     CompositionId = compositionId,
                     TagId = tag.Id
                 });
             }
-            var allTagsByCompositionBefore = _dbContext.CompositionTags.Where(t => t.CompositionId == compositionId);
-            var tagsDeleted = allTagsByCompositionBefore.Except(tagsAfter);
-            var tagsToAdd = tagsAfter.Except(allTagsByCompositionBefore);
-            _dbContext.CompositionTags.RemoveRange(tagsDeleted);
-            _dbContext.CompositionTags.AddRange(tagsToAdd);
+            var tagsToDelete = allTagsByCompositionBefore.Except(compositionTagsExist);
+            _dbContext.CompositionTags.RemoveRange(tagsToDelete);
+            _dbContext.CompositionTags.AddRange(compositionTagsToAdd);
             _dbContext.SaveChanges();
         }
     }

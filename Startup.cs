@@ -34,7 +34,7 @@ namespace Cirice
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<Cirice.Data.Models.User, IdentityRole>(
+            services.AddIdentity<Cirice.Data.Models.User,IdentityRole>(
                     options=>
                     {
                         options.User.RequireUniqueEmail = true;
@@ -42,6 +42,7 @@ namespace Cirice
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequiredLength = 8;
                     })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -53,9 +54,10 @@ namespace Cirice
             services.AddTransient<DbGenreService>();
             services.AddTransient<DbTagService>();
             services.AddTransient<DbCompositionService>();
-            services.AddTransient<DbCompositionTagService>();
             services.AddTransient<DbLikeService>();
             services.AddTransient<DbRatingService>();
+            services.AddTransient<DbChapterService>();
+            services.AddTransient<RightService>();
             var emailSettingsSection = Configuration.GetSection("AppSettings");
             var cloudSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AuthMessageSenderOptions>(emailSettingsSection);

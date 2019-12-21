@@ -20,18 +20,16 @@ namespace Cirice.Controllers
         private DbGenreService _dbGenreService;
         private DbTagService _dbTagService;
         private DbCompositionService _dbCompositionService;
-        private DbCompositionTagService _dbCompositionTagService;
         private DbLikeService _dbLikeService;
         private DbRatingService _dbRatingService;
         private UserManager<User> _userManager;
 
-        private const int NumberOfLoadedCompositions = 5;
+        private const int NumberOfLoadedCompositions = 6;
 
         public HomeController(
             DbCompositionService dbCompositionService,
             DbGenreService dbGenreService,
             DbTagService dbTagService,
-            DbCompositionTagService dbCompositionTagService,
             DbLikeService dbLikeService,
             DbRatingService dbRatingService,
             UserManager<User> userManager)
@@ -39,7 +37,6 @@ namespace Cirice.Controllers
             _dbCompositionService = dbCompositionService;
             _dbGenreService = dbGenreService;
             _dbTagService = dbTagService;
-            _dbCompositionTagService = dbCompositionTagService;
             _dbLikeService = dbLikeService;
             _dbRatingService = dbRatingService;
             _userManager = userManager;

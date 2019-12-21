@@ -206,6 +206,9 @@ namespace Cirice.Controllers
                 
                 if (result.Succeeded)
                 {
+                    var user = await _userManager.FindByEmailAsync(model.Name);
+                    user.LastLogin=DateTime.Now;
+                    await _userManager.UpdateAsync(user);
                     return RedirectToAction("Index", "Home");
                 }
                 else if(result.IsNotAllowed)
@@ -225,15 +228,6 @@ namespace Cirice.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
-        }
-
-
-        public async Task Delete2Users()
-        {
-            var user1 = await _userManager.FindByEmailAsync("evgenxr2000@gmail.com");
-            await _userManager.DeleteAsync(user1);
-            var user2 = await _userManager.FindByEmailAsync("c1r1ce.eugene@gmail.com");
-            await _userManager.DeleteAsync(user2);
         }
 
     }

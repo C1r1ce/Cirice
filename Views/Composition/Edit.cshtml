@@ -2,12 +2,12 @@
 @using Cirice.Data.Models
 @using Cirice.Data.Services
 @model Cirice.Data.ViewModels.CompositionEditViewModel
-@inject Cirice.Data.Services.DbGenreService _dbGenreService
-@inject Cirice.Data.Services.DbTagService _dbTagService
+@inject Cirice.Data.Services.DbGenreService DbGenreService
+@inject Cirice.Data.Services.DbTagService DbTagService
 <div class="container row">
     <div class="col-md-1 bg-light"></div>
     <div class="col-12 col-md-10 bg-light pb-3 pt-3">
-        <form method="post" asp-action="Create" asp-controller="Composition">
+        <form method="post" asp-action="Edit" asp-controller="Composition">
             <input type="hidden" asp-for="Id"/>
             <div asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
@@ -18,7 +18,7 @@
                 <label for="SelectGenre">Select Genre</label>
                 <select asp-for="GenreString" class="form-control" id="SelectGenre">
                     @{
-                        var genres = _dbGenreService.GetGenres();
+                        var genres = DbGenreService.GetGenres();
                         foreach (Genre genre in genres)
                         {
                             <option name="@genre.GenreString">@genre.GenreString</option>
@@ -34,7 +34,7 @@
 
                 <datalist id="tagList">
                     @{
-                        var tags = _dbTagService.GetTags();
+                        var tags = DbTagService.GetTags();
                         foreach (Tag tag in tags)
                         {
                             <option value="@tag.TagString">@tag.TagString</option>

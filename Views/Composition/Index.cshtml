@@ -1,8 +1,11 @@
 ﻿
 @using Cirice.Data.Models
+@using Cirice.Data.Services
+@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Identity
 @model Cirice.Data.ViewModels.CompositionViewModel
-@inject SignInManager<User> SignInManager
+@inject RightService RightService
+@inject UserManager<User> UserManager
 <div class="col-md-1"></div>
 
 @if (Model != null)
@@ -45,7 +48,7 @@
                     </div>
                     <div class="col-6 d-inline-flex">
                         <div class="text-muted mr-1">@Model.Likes</div>
-                        <img src="comments-16.png" height="16px" alt="" />
+                        <img src="~/comments-16.png" class="mt-2"height="16px" alt="" />
                         @{
                             var day = Model.LastPublication.ToString("dd.MM.yyyy");
                             var dayTime = Model.LastPublication.ToString("dd.MM.yyyy HH:mm");
@@ -55,12 +58,12 @@
                     <div class="col-6 d-inline-flex flex-md-row-reverse">
                         <p>Rating: @Model.Rating/5</p>
                     </div>
-                    @if (SignInManager.IsSignedIn(User))
+                    @if (await RightService.CheckRights(Model.CompositionId,await UserManager.GetUserAsync(User)))
                     {
                         <div class="col-12 d-inline-flex">
                             <a asp-action="Image" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit Image</a>
                             <a asp-action="Edit" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit</a>
-                            <a asp-action="Reader" asp-route-id="@Model.CompositionId" class="text-decoration-none text-dark font-weight-bold ml-1 mr-1">Read</a>
+                            <a asp-action="Reader" asp-route-id="@Model.CompositionId" class="text-decoration-none text-dark font-weight-bold ml-4 mr-1 mt-1">Read</a>
                         </div>
                     }
                     else

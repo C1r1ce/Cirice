@@ -21,7 +21,7 @@
     <div id="scrolList">
         <partial name="_Item"/>
     </div>
-    <div id="loading"><img src='@Url.Content("~/loading_spinner.gif")'></div>
+    <div id="loading" class="align-content-center"><img src='@Url.Content("~/loading_spinner.gif")'></div>
 
 <div class="col-md-1"></div>
 
@@ -29,9 +29,9 @@
 {
     <script type="text/javascript">
         $(function () {
-
+ 
             $('div#loading').hide();
-
+ 
             var page = 0;
             var _inCallback = false;
             function loadItems() {
@@ -39,7 +39,7 @@
                     _inCallback = true;
                     page++;
                     $('div#loading').show();
-
+ 
                     $.ajax({
                         type: 'GET',
                         url: '/Home/Index/' + page,
@@ -56,10 +56,10 @@
                     });
                 }
             }
-            // обработка события скроллинга
-            $(window).scroll(function () {
-                if ($(window).scrollTop() == $(document).height() - $(window).height()) {
 
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+ 
                     loadItems();
                 }
             });

@@ -11,7 +11,15 @@ namespace Cirice.Data.Util
         public List<string> FormatTagsToList(string tags)
         {
             String[] strings = tags.Split(',');
-            return strings.Cast<string>().ToList();
+            List<string> result = new List<string>();
+            foreach (var s in strings)
+            {
+                if (!string.IsNullOrWhiteSpace(s))
+                {
+                    result.Add(s);
+                }
+            }
+            return result;
         }
 
         public string FormatTagsToString(IEnumerable<Tag> tags)
@@ -25,6 +33,18 @@ namespace Cirice.Data.Util
             if (result.Length > 1)
             {
                 result.Substring(0, result.Length - 2);
+            }
+            return result;
+        }
+
+        public List<string> FormatTagsToListEdit(string tagsBefore, string tagsAfter)
+        {
+            List<string> result = new List<string>();
+            if (tagsAfter.Contains(tagsBefore))
+            {
+                var indexTagsBefore = tagsAfter.IndexOf(tagsBefore);
+                var tags = tagsAfter.Remove(indexTagsBefore, tagsBefore.Length);
+                result = FormatTagsToList(tags);
             }
             return result;
         }

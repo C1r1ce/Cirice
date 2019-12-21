@@ -1,12 +1,13 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-<form method="post">
-    <textarea id="mytextarea" name="mytextarea"></textarea>
-</form>
+﻿
+<div class="container">
+    <h3>Chapter 1</h3>
+    <form method="post">
+        <textarea id="mytextarea" name="mytextarea" rows="12"></textarea>
+        <div class="col-12 d-inline-flex flex-row-reverse">
+            <button type="submit" class="btn btn-outline-success mt-2">Submit</button>
+        </div>
+    </form>
+</div>
 @section Scripts
 {
     <script src="https://cdn.tiny.cloud/1/30br665bot26vu4269n4w8wh08dfoku03w63ewzg2e3yhyka/tinymce/5/tinymce.min.js"></script>

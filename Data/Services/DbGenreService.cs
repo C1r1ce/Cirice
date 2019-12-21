@@ -36,16 +36,16 @@ namespace Cirice.Data.Services
             return _dbContext.Set<Genre>();
         }
 
-        public async Task AddGenresAsync(ICollection<Genre> genres)
+        public async Task AddGenresAsync(IEnumerable<Genre> genres)
         {
             await _dbContext.Genres.AddRangeAsync(genres);
             await _dbContext.SaveChangesAsync();
         }
 
-        public void AddGenre(Genre genre)
+        public async Task AddGenreAsync(Genre genre)
         {
-            _dbContext.Genres.Add(genre);
-            _dbContext.SaveChanges();
+            await _dbContext.Genres.AddAsync(genre);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

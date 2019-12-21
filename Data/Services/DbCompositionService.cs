@@ -51,7 +51,10 @@ namespace Cirice.Data.Services
 
         public void Update(Composition composition)
         {
-            _dbContext.Compositions.Update(composition);
+            var compositionDb = _dbContext.Compositions.Find(composition.Id);
+            compositionDb.Annotation = composition.Annotation;
+            compositionDb.GenreId = composition.GenreId;
+            compositionDb.Name = composition.Name;
             _dbContext.SaveChanges();
         }
 

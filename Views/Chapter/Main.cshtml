@@ -1,0 +1,52 @@
+﻿@model Cirice.Data.ViewModels.ChapterMainViewModel
+<div class="col-md-1 bg-light"></div>
+<div class="col-12 col-md-10 bg-light">
+    <div class="m-2 mt-4 pb-4">
+        <div class="row">
+            <div class="col-12">
+                <p class="col-12 font-weight-bold text-center">@Model.CompositionName</p>
+                <div class="col-12 font-weight-bold">Edit chapter text:</div>
+                <div class="col-12 d-inline">
+                    @foreach (var chapter in Model.ChapterNumbersAndIds)
+                    {
+                        <a class="font-weight-bold p-2 m-2" asp-action="Index" asp-controller="Chapter"
+                           asp-route-compositionId="@Model.CompositionId" asp-route-chapterId="@chapter.ChapterId">@chapter.Number</a>
+                    }
+                    <form method="post" class="d-inline">
+                        <button type="Submit" class="btn btn-link font-weight-bold">Add</button>
+                    </form>
+                </div>
+                @if (Model.ChapterNumbersAndIds.Count > 2)
+                {
+                    <form method="post" asp-action="Main" asp-controller="Chapter">
+                        <div class="col-12 font-weight-bold">Swap Chapters:</div>
+                        <div class="col-12 d-inline-flex row">
+                            <div class="form-group col-lg-6 col-12 ">
+                                <label for="SelectChapter1" class="font-weight-bold">Select First Chapter</label>
+                                <select asp-for="ChapterIdFirst" class="form-control" id="SelectChapter1">
+                                    @foreach (var chapter in Model.ChapterNumbersAndIds)
+                                    {
+                                        <option value="@chapter.ChapterId">@chapter.Number</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-6 col-12 ">
+                                <label for="SelectChapter2" class="font-weight-bold">Select Second Chapter</label>
+                                <select asp-for="ChapterIdSecond" class="form-control" id="SelectChapter2">
+                                    @foreach (var chapter in Model.ChapterNumbersAndIds)
+                                    {
+                                        <option value="@chapter.ChapterId">@chapter.Number</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 d-inline-flex flex-row-reverse">
+                            <button type="submit" class="btn btn-outline-success mt-2">Swap</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-1 bg-light"></div>
