@@ -39,8 +39,11 @@
                     <h6 class="font-weight-normal">@composition.Annotation</h6>
                 </div>
                 <div class="col-6 d-inline-flex">
-                    <div class="text-muted mr-1">@composition.Likes</div>
-                    <img src="comments-16.png" height="16px" alt="" class="mt-2" />
+                    <div class="text-muted mr-1">@composition.Comments</div>
+                    <img src="~/comments-16.png" height="16" alt="" class="mt-2" />
+                    <div class="text-muted mr-1 ml-4">@composition.Likes</div>
+                    <i class="far fa-heart mt-2"></i>
+
                     @{
                         var day = composition.LastPublication.ToString("dd.MM.yyyy");
                         var dayTime = composition.LastPublication.ToString("dd.MM.yyyy HH:mm");

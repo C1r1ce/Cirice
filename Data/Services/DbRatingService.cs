@@ -31,6 +31,40 @@ namespace Cirice.Data.Services
             }
             return result;
         }
+
+        public void Add(Rating rating)
+        {
+            _dbContext.Ratings.Add(rating);
+            _dbContext.SaveChanges();
+        }
+
+        public Rating FindByUserIdAndCompositionId(string userId, long compositionId)
+        {
+            var ratings = _dbContext.Ratings.Where(r => compositionId == r.CompositionId).ToList();
+            ratings = ratings.Where(r => r.UserId.Equals(userId)).ToList();
+            Rating result = null;
+            if (ratings.Any())
+            {
+                result = ratings.First();
+            }
+
+            return result;
+        }
+
+        public void UpdateMark(string userId, long compositionId, byte mark)
+        {
+            var rating = FindByUserIdAndCompositionId(userId, compositionId);
+            rating.Mark = mark;
+            _dbContext.Ratings.Update(rating);
+            _dbContext.SaveChanges();
+        }
+
+        public void RemoveByUserId(string userId)
+        {
+            var ratings = _dbContext.Ratings.Where(r => r.UserId.Equals(userId)).ToList();
+            _dbContext.Ratings.RemoveRange(ratings);
+            _dbContext.SaveChanges();
+        }
         
     }
 }

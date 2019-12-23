@@ -37,6 +37,9 @@ namespace Cirice
             services.AddIdentity<Cirice.Data.Models.User,IdentityRole>(
                     options=>
                     {
+                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                        options.Lockout.MaxFailedAccessAttempts = 3;
+                        options.Lockout.AllowedForNewUsers = true;
                         options.User.RequireUniqueEmail = true;
                         options.SignIn.RequireConfirmedEmail = true;
                         options.Password.RequireNonAlphanumeric = false;
@@ -58,6 +61,7 @@ namespace Cirice
             services.AddTransient<DbRatingService>();
             services.AddTransient<DbChapterService>();
             services.AddTransient<RightService>();
+            services.AddTransient<DbCommentService>();
             var emailSettingsSection = Configuration.GetSection("AppSettings");
             var cloudSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AuthMessageSenderOptions>(emailSettingsSection);

@@ -32,5 +32,15 @@ namespace Cirice.Controllers
         {
             return View();
         }
+
+        public IActionResult EmptyComposition()
+        {
+            return View();
+        }
+
+        public IActionResult AdminCantAddComposition()
+        {
+            return View();
+        }
     }
 }

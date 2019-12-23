@@ -53,6 +53,14 @@
                 </div>
             </div>
         </form>
+        <form method="post" class="mt-5" asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <div class="row">
+                <div class="col-12 d-inline-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-outline-danger ">Delete</button>
+                </div>
+            </div>
+        </form>
     </div>
     <div class="col-md-1 bg-light"></div>
 </div>
@@ -66,6 +74,5 @@
                 }
             });
     </script>
-    <script src="~/js/dropzone.js"></script>
     <script src="~/js/jquery.flexdatalist.min.js"></script>
 }

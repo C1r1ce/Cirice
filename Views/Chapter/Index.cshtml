@@ -1,8 +1,11 @@
-﻿
+﻿@model Cirice.Data.ViewModels.ChapterViewModel
 <div class="container">
-    <h3>Chapter 1</h3>
-    <form method="post">
-        <textarea id="mytextarea" name="mytextarea" rows="12"></textarea>
+    <h3>Chapter @Model.Number</h3>
+    <form method="post" asp-action="Index" asp-controller="Chapter">
+        <div asp-validation-summary="ModelOnly"></div>
+        <input type="hidden" asp-for="CompositionId" />
+        <input type="hidden" asp-for="ChapterId" />
+        <textarea asp-for="Text" id="mytextarea" rows="12"></textarea>
         <div class="col-12 d-inline-flex flex-row-reverse">
             <button type="submit" class="btn btn-outline-success mt-2">Submit</button>
         </div>

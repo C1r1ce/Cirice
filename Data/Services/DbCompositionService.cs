@@ -67,6 +67,42 @@ namespace Cirice.Data.Services
             return compositions;
         }
 
-      
+        public IEnumerable<Composition> FindByUserId(string userId)
+        {
+            return _dbContext.Compositions.Where(c => c.UserId.Equals(userId)).ToList();
+        }
+
+        public void DeleteByUserId(string userId)
+        {
+            var compositions = FindByUserId(userId);
+            foreach (var composition in compositions)
+            {
+                Delete(composition);
+            }
+        }
+
+        public void Delete(Composition composition)
+        {
+            var chapters = _dbContext.Chapters.Where(ch => ch.CompositionId == composition.Id).ToList();
+            var compositionTags = _dbContext.CompositionTags.Where(ct => ct.CompositionId == composition.Id).ToList();
+            var comments = _dbContext.Comments.Where(c => c.CompositionId == composition.Id).ToList();
+            var likes = _dbContext.Likes.Where(l => l.CompositionId == composition.Id).ToList();
+            var ratings = _dbContext.Ratings.Where(r => r.CompositionId == composition.Id).ToList();
+            _dbContext.Compositions.Remove(composition);
+            _dbContext.Chapters.RemoveRange(chapters);
+            _dbContext.CompositionTags.RemoveRange(compositionTags);
+            _dbContext.Comments.RemoveRange(comments);
+            _dbContext.Ratings.RemoveRange(ratings);
+            _dbContext.SaveChanges();
+        }
+
+        public void UpdateLastPublication(long compositionId)
+        {
+            var dbComposition = _dbContext.Compositions.Find(compositionId);
+            dbComposition.LastPublication = DateTime.Now;
+            _dbContext.SaveChanges();
+        }
+
+
     }
 }

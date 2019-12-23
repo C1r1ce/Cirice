@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Cirice.Data.Models;
 using Cirice.Data.Services;
@@ -29,10 +30,57 @@ namespace Cirice.Controllers
             _chapterService = chapterService;
         }
 
-        [Route("Chapter/{id?}")]
-        public IActionResult Index()
+        [Route("Chapter/{compositionId?}/{chapterId?}")]
+        public async Task<IActionResult> Index(long compositionId,long chapterId)
         {
-            return View();
+            IActionResult result = BadRequest();
+            if (await _rightService.CheckRights(compositionId, await _userManager.GetUserAsync(HttpContext.User)))
+            {
+                var chapter = await _chapterService.FindByIdAsync(chapterId);
+                if (chapter != null)
+                {
+                    ChapterViewModel viewModel=new ChapterViewModel()
+                    {
+                        ChapterId = chapter.Id,
+                        CompositionId = chapter.CompositionId,
+                        Number = chapter.Number,
+                        Text = chapter.Text
+                    };
+                    result = View(viewModel);
+                }
+            }
+            else
+            {
+                result = RedirectToAction("AccessDenied", "Notifications");
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("Chapter/{compositionId?}/{chapterId?}")]
+        public async Task<IActionResult> Index(ChapterViewModel model)
+        {
+            IActionResult result = RedirectToAction("AccessDenied", "Notifications");
+            if (await _rightService.CheckRights(model.CompositionId, await _userManager.GetUserAsync(HttpContext.User)))
+            {
+                var chapter = await _chapterService.FindByIdAsync(model.ChapterId);
+                if (chapter != null)
+                {
+                    chapter.Text = model.Text;
+                    _chapterService.UpdateChapter(chapter);
+                    var url = Url.Action("Main", "Chapter", new {id = model.CompositionId});
+                    result = Redirect(url);
+                }
+                else
+                {
+                    result = BadRequest();
+                }
+                
+            }
+
+            return result;
         }
 
         [HttpGet]
@@ -68,6 +116,7 @@ namespace Cirice.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Main(ChapterMainViewModel model)
         {
             if (await _rightService.CheckRights(model.CompositionId, await _userManager.GetUserAsync(HttpContext.User)))
@@ -87,6 +136,52 @@ namespace Cirice.Controllers
             {
                 return RedirectToAction("AccessDenied", "Notifications");
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(ChapterMainViewModel model)
+        {
+            if (await _rightService.CheckRights(model.CompositionId, await _userManager.GetUserAsync(HttpContext.User)))
+            {
+                var chapters = _chapterService.FindByCompositionId(model.CompositionId);
+                int lastNumber = 0;
+                foreach (var chapter in chapters)
+                {
+                    if (chapter.Number > lastNumber)
+                    {
+                        lastNumber = chapter.Number;
+                    }
+                }
+
+                lastNumber++;
+                Chapter newChapter = new Chapter()
+                {
+                    CompositionId = model.CompositionId,
+                    Number = lastNumber,
+                    Text = "Put your text here"
+                };
+                _chapterService.Add(newChapter);
+                _compositionService.UpdateLastPublication(model.CompositionId);
+                var dbChapter = _chapterService.FindByCompositionIdAndNumber(model.CompositionId, lastNumber);
+                var url = Url.Action("Index", "Chapter",
+                    new {compositionId = model.CompositionId, chapterId = dbChapter.Id});
+                return Redirect(url);
+            }
+            else
+            {
+                return RedirectToAction("AccessDenied", "Notifications");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> Delete(ChapterMainViewModel model)
+        {
+            await _chapterService.RemoveById(model.ChapterIdToDelete);
+            var url = Url.Action("Main", "Chapter", new { id=model.CompositionId });
+            return Redirect(url);
         }
     }
 }

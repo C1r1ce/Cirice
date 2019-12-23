@@ -30,6 +30,7 @@ namespace Cirice.Controllers
         private DbLikeService _dbLikeService;
         private DbRatingService _dbRatingService;
         private RightService _rightService;
+        private DbCommentService _dbCommentService;
 
 
         public CompositionController(UserManager<User> userManager,
@@ -40,7 +41,8 @@ namespace Cirice.Controllers
             DbLikeService dbLikeService,
             DbRatingService dbRatingService,
             RoleManager<IdentityRole> roleManager,
-            RightService rightService)
+            RightService rightService,
+            DbCommentService dbCommentService)
         {
             _userManager = userManager;
             _dbCompositionService = dbCompositionService;
@@ -51,6 +53,7 @@ namespace Cirice.Controllers
             _dbRatingService = dbRatingService;
             _roleManager = roleManager;
             _rightService = rightService;
+            _dbCommentService = dbCommentService;
         }
         // GET: Composition
         [Route("Composition/{id?}")]
@@ -64,6 +67,7 @@ namespace Cirice.Controllers
                 var likeCount = _dbLikeService.GetLikeCountByCompositionId(composition.Id);
                 var rating = _dbRatingService.GetAverageRatingByCompositionId(composition.Id);
                 var user = _userManager.FindByIdAsync(composition.UserId).Result;
+                var commentCount = _dbCommentService.GetCommentCountByCompositionId(composition.Id);
                 return View(new CompositionViewModel()
                 {
                     Annotation = composition.Annotation,
@@ -76,7 +80,9 @@ namespace Cirice.Controllers
                     Tags = tags,
                     UserName = user.UserName,
                     CompositionId = composition.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Comments = commentCount
+                    
                 });
             }
             return View();
@@ -86,9 +92,12 @@ namespace Cirice.Controllers
 
         // GET: Composition/Create
         [Authorize]
-        public IActionResult Create()
+        public IActionResult Create(string userId)
         {
-            return View();
+            return View(new CompositionCreateViewModel()
+            {
+                UserId = userId
+            });
         }
 
 
@@ -96,8 +105,27 @@ namespace Cirice.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CompositionCreateViewModel model)
+        public async Task<IActionResult> Create(CompositionCreateViewModel model,string userId)
         {
+            string ownerId;
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (await _userManager.IsInRoleAsync(user,"admin"))
+            {
+                if (!string.IsNullOrEmpty(userId)&&!userId.Equals(user.Id))
+                {
+                    ownerId = userId;
+                }
+                else
+                {
+                    return RedirectToAction("AdminCantAddComposition", "Notifications");
+                }
+                
+            }
+            else
+            {
+                var owner = await _userManager.GetUserAsync(HttpContext.User);
+                ownerId = owner.Id;
+            }
             if (ModelState.IsValid)
             {
                 if (_dbCompositionService.FindByName(model.Name) == null)
@@ -109,7 +137,7 @@ namespace Cirice.Controllers
                         GenreId = _dbGenreService.FindByGenreString(model.GenreString).Id,
                         LastPublication = DateTime.Now,
                         Name=model.Name,
-                        UserId = _userManager.GetUserAsync(HttpContext.User).Result.Id
+                        UserId = ownerId
                     };
                     _dbCompositionService.AddComposition(composition);
                     long compositionId = _dbCompositionService.FindByName(composition.Name).Id;
@@ -228,15 +256,8 @@ namespace Cirice.Controllers
 
         }
 
-        // GET: Composition/Create
-        public ActionResult Reader()
-        {
-            return View();
-        }
-        
-       
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task Upload(IFormFile file,long id)
         {
             if (await _rightService.CheckRights(id, _userManager.GetUserAsync(HttpContext.User).Result))
@@ -249,6 +270,28 @@ namespace Cirice.Controllers
                     _dbCompositionService.Update(composition);
                 }
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(CompositionEditViewModel model)
+        {
+            IActionResult result=BadRequest();
+            if (await _rightService.CheckRights(model.Id, _userManager.GetUserAsync(HttpContext.User).Result))
+            {
+                var composition = _dbCompositionService.FindById(model.Id);
+                if (composition != null)
+                {
+                    _dbCompositionService.Delete(composition);
+                    result = RedirectToAction("Index", "Home");
+                }
+            }
+            else
+            {
+                result = RedirectToAction("AccessDenied", "Notifications");
+            }
+
+            return result;
         }
     }
 }

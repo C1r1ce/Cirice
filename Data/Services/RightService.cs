@@ -31,5 +31,20 @@ namespace Cirice.Data.Services
             }
             return false;
         }
+
+        public async Task<bool> CheckRightsToUserEdit(User currentUser, string ownerId)
+        {
+            if (currentUser != null)
+            {
+                var ownerUser = await _userManager.FindByIdAsync(ownerId);
+                if (ownerUser != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(currentUser);
+                    return ownerUser.Id == ownerId
+                           || roles.Contains("admin");
+                }
+            }
+            return false;
+        }
     }
 }

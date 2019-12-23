@@ -8,7 +8,7 @@
         <form asp-action="Upload" asp-controller="Composition" class="dropzone" id="my-awesome-dropzone"></form>
         <div class="row">
             <div class="col-12 d-inline-flex flex-row-reverse">
-                <a href="#" class="btn btn-outline-success mt-2">Finish</a>
+                <a asp-action="Index" asp-controller="Composition" asp-route-id="@Model.Id" class="btn btn-outline-success mt-2">Finish</a>
             </div>
         </div>
     </div>

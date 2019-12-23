@@ -17,6 +17,7 @@ namespace Cirice.Data.ViewModels
         public IQueryable<Tag> Tags { get; set; }
         public double Rating { get; set; }
         public int Likes { get; set; }
+        public int Comments { get; set; }
         public long CompositionId { get; set; }
         public string UserId { get; set; }
     }

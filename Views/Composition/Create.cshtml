@@ -1,6 +1,7 @@
 ﻿@using System.Collections.Specialized
 @using Cirice.Data.Models
 @using Cirice.Data.Services
+@using Microsoft.AspNetCore.Identity
 @model Cirice.Data.ViewModels.CompositionCreateViewModel
 @inject Cirice.Data.Services.DbGenreService _dbGenreService
 @inject Cirice.Data.Services.DbTagService _dbTagService
@@ -8,10 +9,11 @@
     <div class="col-md-1 bg-light"></div>
     <div class="col-12 col-md-10 bg-light pb-3 pt-3">
         <form method="post" asp-action="Create" asp-controller="Composition">
+            <input type="hidden" asp-for="UserId"/>
             <div asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
                 <div for="compositionName">Name of composition</div>
-                <input asp-for="Name" type="text" class="form-control" id="compositionName" placeholder="Enter name of your composition" />
+                <input asp-for="Name" type="text" class="form-control" id="compositionName" placeholder="Enter name of your composition"/>
             </div>
             <div class="form-group">
                 <label for="SelectGenre">Select Genre</label>
@@ -26,7 +28,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <div for="tags" class="d-inline-flex">Tags<div class="text-muted">(Use enter to add tag)</div></div>
+                <div for="tags" class="d-inline-flex">Tags
+                    <div class="text-muted">(Use enter to add tag)</div></div>
                 <input asp-for="Tags" type="text" placeholder="Enter tags" class="flexdatalist form-control" data-min-length="1" multiple='multiple'
                        list="tagList" name='tags'>
 
@@ -41,7 +44,8 @@
                 </datalist>
             </div>
             <div class="form-group">
-                <div for="annotation" class="d-inline-flex">Annotation<div class="text-muted">(max length 200 symbols)</div></div>
+                <div for="annotation" class="d-inline-flex">Annotation
+                    <div class="text-muted">(max length 200 symbols)</div></div>
                 <textarea asp-for="Annotation" class="form-control" id="annotation" name="Annotation" title=""></textarea>
             </div>
             <div class="row">

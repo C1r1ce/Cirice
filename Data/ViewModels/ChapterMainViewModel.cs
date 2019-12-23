@@ -11,12 +11,12 @@ namespace Cirice.Data.ViewModels
         public string CompositionName { get; set; }
         public long CompositionId { get; set; }
         public List<ChapterNumberAndId> ChapterNumbersAndIds { get; set; }
-
-        [Required] 
         public long ChapterIdFirst { get; set; }
 
-        [Required]
         public long ChapterIdSecond { get; set; }
+
+        public long ChapterIdToDelete { get; set; }
+
     }
 
     public class ChapterNumberAndId

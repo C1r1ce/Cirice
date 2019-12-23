@@ -8,7 +8,7 @@ namespace Cirice.Data.Models
     public class Comment
     {
         public long Id { get; set; }
-        public long UserId { get; set; }
+        public string UserId { get; set; }
         public long CompositionId { get; set; }
         public string Text { get; set; }
         public DateTime DateTime { get; set; }

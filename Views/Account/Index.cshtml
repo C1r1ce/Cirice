@@ -1,1 +1,24 @@
-﻿<h1>Some Account</h1>
+﻿@using Cirice.Data.Models
+@using Cirice.Data.Services
+@using Microsoft.AspNetCore.Identity
+@model Cirice.Data.ViewModels.UserViewModel
+@inject RightService RightService
+@inject UserManager<User> UserManager
+<div class="container row">
+    <div class="col-md-1 bg-light"></div>
+    <div class="col-12 col-md-10 bg-light pb-3 pt-3">
+        <div class="row col-12 d-inline-flex mb-2">
+            <div class="text-muted mr-2 ">User name:</div>
+            <div>@Model.UserName</div>
+        </div>
+        <div class="mt-2 mb-2">@Model.UserAbout</div>
+        @if (await RightService.CheckRightsToUserEdit(await UserManager.GetUserAsync(User), Model.UserId))
+        {
+            <a asp-action="Create" asp-controller="Composition" asp-route-userId="@Model.UserId" class="btn btn-outline-info">Add Composition</a>
+        }
+
+        <div class="mt-5 text-muted">User compositions:</div>
+        <partial name="_ItemToUserView"/>
+    </div>
+    <div class="col-md-1 bg-light"></div>
+</div>

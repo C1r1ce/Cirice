@@ -47,8 +47,10 @@
                         <h6 class="font-weight-normal">@Model.Annotation</h6>
                     </div>
                     <div class="col-6 d-inline-flex">
-                        <div class="text-muted mr-1">@Model.Likes</div>
-                        <img src="~/comments-16.png" class="mt-2"height="16px" alt="" />
+                        <div class="text-muted mr-1">@Model.Comments</div>
+                        <img src="~/comments-16.png" height="16" alt="" class="mt-2" />
+                        <div class="text-muted mr-1 ml-4">@Model.Likes</div>
+                        <i class="far fa-heart mt-2"></i>
                         @{
                             var day = Model.LastPublication.ToString("dd.MM.yyyy");
                             var dayTime = Model.LastPublication.ToString("dd.MM.yyyy HH:mm");
@@ -60,16 +62,19 @@
                     </div>
                     @if (await RightService.CheckRights(Model.CompositionId,await UserManager.GetUserAsync(User)))
                     {
-                        <div class="col-12 d-inline-flex">
-                            <a asp-action="Image" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit Image</a>
-                            <a asp-action="Edit" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit</a>
-                            <a asp-action="Reader" asp-route-id="@Model.CompositionId" class="text-decoration-none text-dark font-weight-bold ml-4 mr-1 mt-1">Read</a>
-                        </div>
+                <div class="col-12 d-inline-flex">
+                    <a asp-action="Image" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit Image</a>
+                    <a asp-action="Edit" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit</a>
+                    <a asp-action="Main" asp-controller="Chapter" asp-route-id="@Model.CompositionId" class="btn btn-outline-info ml-1 mr-1">Edit Chapters</a>
+                    <a asp-action="Index" asp-controller="Reader" 
+                       asp-route-compositionId="@Model.CompositionId" class="text-decoration-none text-dark font-weight-bold ml-4 mr-1 mt-1">Read</a>
+                </div>
                     }
                     else
                     {
                         <div class="col-12 d-inline-flex">
-                            <a asp-action="Reader" class="text-decoration-none text-dark font-weight-bold ml-1">Read</a>
+                            <a asp-action="Index" asp-controller="Reader" 
+                               asp-route-compositionId="@Model.CompositionId" class="text-decoration-none text-dark font-weight-bold ml-1">Read</a>
                         </div>
                     }
 

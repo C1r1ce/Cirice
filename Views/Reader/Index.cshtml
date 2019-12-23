@@ -1,1 +1,95 @@
-﻿
+﻿@using Cirice.Data.Models
+@using Microsoft.AspNetCore.Identity
+@using MimeKit.Text
+@model Cirice.Data.ViewModels.ReaderChapterViewModel
+@inject UserManager<User> UserManager
+<div class="col-2 text-left">
+    <p>
+        <a asp-action="Index" asp-controller="Composition" asp-route-id="@Model.CompositionId"
+           class="text-decoration-none font-weight-bold text-dark">@Model.CompositionName</a>
+    </p>
+    @foreach (var chapter in Model.ChapterNumbersAndIds)
+    {
+        <p>
+            <a asp-action="Index" asp-controller="Reader" asp-route-compositionId="@Model.CompositionId"
+               asp-route-chapterId="@chapter.ChapterId" class="text-decoration-none font-weight-bold text-dark">Chapter @chapter.Number</a>
+        </p>
+    }
+</div>
+<div class="col-8">
+    <h4 class="text-center">Chapter @Model.ChapterNumber</h4>
+    <div id="text">@Html.Raw(Model.Text)</div>
+    <div class="row">
+        <form method="post" class="col-12 d-inline-flex flex-row-reverse mt-2 mb-2" asp-action="Like">
+            <input type="hidden" asp-for="CompositionId" />
+            <input type="hidden" asp-for="ChapterId" />
+            @{
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = await UserManager.GetUserAsync(User);
+                    if (Model.LikeUserIds.Contains(user.Id))
+                    {
+                        <button type="submit" class="btn btn-link"><i class="fas fa-heart"></i></button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-link"><i class="far fa-heart"></i></button>
+                    }
+                }
+                else
+                {
+                    <i class="far fa-heart mt-3 ml-2"></i>
+                }
+
+            }
+            <div class="mt-2">@Model.LikeUserIds.Count</div>
+        </form>
+        <div class="col-6">
+            @if (Model.ChapterNumber > 1)
+            {
+                var chapterIdPrevious = Model.ChapterId;
+                var chapterByNumberPrevious = Model.ChapterNumbersAndIds.Where(c => c.Number == Model.ChapterNumber - 1);
+                if (chapterByNumberPrevious.Any())
+                {
+                    chapterIdPrevious = chapterByNumberPrevious.First().ChapterId;
+                }
+
+                <a asp-action="Index" asp-controller="Reader"
+                   asp-route-chapterId="@chapterIdPrevious" asp-route-compositionId="@Model.CompositionId" class="btn btn-dark">Previous</a>
+            }
+        </div>
+        <div class="col-6 d-inline-flex flex-row-reverse">
+            @if (Model.ChapterNumbersAndIds.Count > Model.ChapterNumber)
+            {
+                var chapterIdNext = Model.ChapterId;
+                var chapterByNumberNext = Model.ChapterNumbersAndIds.Where(c => c.Number == Model.ChapterNumber + 1);
+                if (chapterByNumberNext.Any())
+                {
+                    chapterIdNext = chapterByNumberNext.First().ChapterId;
+                }
+                <a asp-action="Index" asp-controller="Reader"
+                   asp-route-chapterId="@chapterIdNext" asp-route-compositionId="@Model.CompositionId" class="btn btn-dark">Next</a>
+            }
+            else
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    <form method="post" asp-action="Rate">
+                        <input type="hidden" asp-for="CompositionId"/>
+                        <input type="hidden" asp-for="ChapterId"/>
+                        <select asp-for="Rating">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <button type="submit" class="btn btn-outline-info">Rate</button>
+                    </form>
+                }
+
+            }
+
+        </div>
+    </div>
+</div>

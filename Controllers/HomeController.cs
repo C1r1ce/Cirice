@@ -23,6 +23,7 @@ namespace Cirice.Controllers
         private DbLikeService _dbLikeService;
         private DbRatingService _dbRatingService;
         private UserManager<User> _userManager;
+        private DbCommentService _dbCommentService;
 
         private const int NumberOfLoadedCompositions = 6;
 
@@ -32,7 +33,8 @@ namespace Cirice.Controllers
             DbTagService dbTagService,
             DbLikeService dbLikeService,
             DbRatingService dbRatingService,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            DbCommentService dbCommentService)
         {
             _dbCompositionService = dbCompositionService;
             _dbGenreService = dbGenreService;
@@ -40,6 +42,7 @@ namespace Cirice.Controllers
             _dbLikeService = dbLikeService;
             _dbRatingService = dbRatingService;
             _userManager = userManager;
+            _dbCommentService = dbCommentService;
         }
 
         public async Task<IActionResult> Index(int? id)
@@ -73,6 +76,7 @@ namespace Cirice.Controllers
                 var likeCount = _dbLikeService.GetLikeCountByCompositionId(composition.Id);
                 var rating = _dbRatingService.GetAverageRatingByCompositionId(composition.Id);
                 var user = _userManager.FindByIdAsync(composition.UserId).Result;
+                var commentCount = _dbCommentService.GetCommentCountByCompositionId(composition.Id);
                 list.Add(new CompositionViewModel()
                 {
                     Annotation = composition.Annotation,
@@ -85,7 +89,8 @@ namespace Cirice.Controllers
                     Tags = tags,
                     UserName = user.UserName,
                     CompositionId = composition.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Comments = commentCount
                 });
             }
 

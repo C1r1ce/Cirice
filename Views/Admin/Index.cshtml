@@ -1,0 +1,94 @@
+﻿@using Cirice.Data.Models
+@using Microsoft.AspNetCore.Identity
+@model Cirice.Data.ViewModels.AdminViewModel
+@inject UserManager<User> UserManager
+<div class="container-fluid">
+    <form method="post" asp-action="Edit">
+        <div class="d-flex flex-row form-group">
+            <div class="p-2">
+                <select class="form-control" name="action">
+                    <option value="block">Block</option>
+                    <option value="unlock">Unlock</option>
+                    <option value="delete">Delete</option>
+                    <option value="giveAdmin">Give Admin</option>
+                    <option value="removeAdmin">Remove Admin</option>
+                </select>
+            </div>
+
+            <div class="p-2">
+                <button class="btn btn-success my-2 my-sm-0" type="submit">Submit</button>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input checkBox" id="globalCheckbox">
+                    <label class="form-check-label " for="globalCheckbox">Choose All</label>
+                </div>
+            </div>
+        </div>
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">First login</th>
+                    <th scope="col">Last login</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Roles</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users)
+                {
+                    <tr>
+                        <th scope="row">
+                            <input class="checkBoxClass" type="checkbox" value=@user.Id name="userCheckBox">
+                        </th>
+                        <td><a asp-action="Index" asp-controller="Account" asp-route-user="@user.Id">@user.UserName</a></td>
+                        <td>@user.Email</td>
+                        <td>@user.FirstLogin</td>
+                        <td>@user.LastLogin</td>
+                        @{
+                            string block;
+                            if (user.LockoutEnabled)
+                            {
+                                block = "Blocked";
+                            }
+                            else
+                            {
+                                block = "Active";
+                            }
+                        }
+                        <td>@block</td>
+                        @{
+                            var userRoles = await UserManager.GetRolesAsync(user);
+                            var rolesString = "";
+                            foreach (var userRole in userRoles)
+                            {
+                                rolesString += userRole + " ";
+                            }
+                            
+                        }
+                        @if (userRoles.Count == 0)
+                        {
+                            <td>no roles</td>
+                        }
+                        else
+                        {
+                            <td>@rolesString</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+</div>
+@section Scripts{
+    <script>
+        $('.checkBox').click(function(){
+            if($(".checkBox").length == $(".checkBox:checked").length) {
+                $(".checkBoxClass").prop("checked", true);
+            }else {
+                $(".checkBoxClass").prop("checked", false);
+            }
+        });
+    </script>
+}
